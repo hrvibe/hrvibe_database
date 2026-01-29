@@ -2,17 +2,21 @@
 """
 Shared database models and configuration for all bots.
 """
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, JSON, BigInteger, TIMESTAMP, ForeignKey, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 
-# Import DATABASE_URL from shared config
-from config import DATABASE_URL
+# Load .env (if present)
+load_dotenv()
 
-# Strip whitespace and special characters that might be accidentally included
-DATABASE_URL = DATABASE_URL.strip().rstrip('%')
+# Read DATABASE_URL from .env or environment
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip().rstrip('%')
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set. Define it in .env or environment variables.")
 
 # Fix: Render использует postgresql+psycopg2, но URL может быть с postgres://
 if DATABASE_URL.startswith("postgres://"):
